@@ -17,3 +17,5 @@ libraryDependencies += "default" %% "trailer-maker" % "0.1"
 
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "io.trailermaker.binders._"
+
+libraryDependencies += "com.github.pathikrit"       %% "better-files"   % "3.2.0"
