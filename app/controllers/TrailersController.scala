@@ -33,7 +33,7 @@ object TrailersController {
   val trailerForm = Form(
     mapping(
       "duration" -> number(min = 2000, max = 30000),
-      "length" -> number(min = 1000, max = 5000),
+      "length"   -> number(min = 1000, max = 5000),
     )(TrailerData.apply)(TrailerData.unapply)
   )
 }
@@ -48,25 +48,19 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
     MessagesImpl(lang, messagesApi)
   }
 
-  def ajaxCall = Action { implicit request =>
-    Ok("Ajax Call!")
-  }
-
   def makeTrailer = Action.async(parse.multipartFormData) { implicit request =>
     request.body
       .file("video")
+      .filterNot(_.ref.length == 0)
       .map { video =>
-        // only get the last part of the filename
-        // otherwise someone can send a path like ../../home/foo/bar.txt to write to other files on the system
         val filename = UUID.randomUUID().toString
-
-        val tmpFile = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
+        val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
 
         trailerForm.bindFromRequest.fold(
           formWithErrors =>
             Future {
-              Ok(views.html.index(formWithErrors))
-          },
+              BadRequest(views.html.index(formWithErrors))
+            },
           userData => {
             val outStr    = UUID.randomUUID().toString
             val outFolder = configuration.underlying.getString("output.folder")
@@ -79,6 +73,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
       .getOrElse {
         Future { Redirect(routes.HomeController.index).flashing("error" -> "Missing file") }
       }
+
   }
 
   def getTrailer(fileName: String) = Action { implicit request =>

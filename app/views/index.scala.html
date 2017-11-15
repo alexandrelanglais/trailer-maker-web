@@ -1,24 +1,28 @@
-@(trailerForm: Form[TrailerData])(implicit messages: Messages)
+@(trailerForm: Form[TrailerData])(implicit messages: Messages, flash: Flash)
+
+@implicitField = @{ helper.FieldConstructor(trailer.f) }
 
 @main("Trailer Maker") {
 <h1>Easy way to create trailers.</h1>
 <h3>Just upload your video and adjust your settings</h3>
 
-@helper.form(action = routes.TrailersController.makeTrailer(), 'enctype -> "multipart/form-data") {
-  @helper.inputText(trailerForm("duration"))
-  @helper.inputText(trailerForm("length"))
+@flash.get("error").map(err => {
+<h2>@err</h2>
+})
 
-  <input type="file" name="video">
+@helper.form(action = routes.TrailersController.makeTrailer(), 'enctype -> "multipart/form-data") {
+
+
+<p>
+<input type="file" name="video">
+
+  @helper.inputText(trailerForm("duration"), '_showConstraints -> false)
+  @helper.inputText(trailerForm("length"), '_showConstraints -> false)
+
   <p>
     <input type="submit">
   </p>
 }
 
-<!--
-<form id="formTrailer" method="post" action="/mt">
-  <input type="text" name="length" placeholder="Final length in ms" value="15000"/>
-  <input type="submit" value="Go!"/>
-</form>
--->
 <div id="progress"></div>
 }
