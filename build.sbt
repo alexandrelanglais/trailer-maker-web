@@ -1,4 +1,4 @@
-name := """trailer-maker-web"""
+name := """Trailer maker web"""
 organization := "io.trailermaker"
 
 version := "1.0-SNAPSHOT"
@@ -18,4 +18,4 @@ libraryDependencies += "default" %% "trailer-maker" % "0.1"
 // Adds additional packages into conf/routes
 // play.sbt.routes.RoutesKeys.routesImport += "io.trailermaker.binders._"
 
-libraryDependencies += "com.github.pathikrit"       %% "better-files"   % "3.2.0"
+libraryDependencies += "com.github.pathikrit" %% "better-files" % "3.2.0"

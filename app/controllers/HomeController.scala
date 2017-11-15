@@ -35,8 +35,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def makeTrailer() = Action.async {
     TrailerMaker
       .makeTrailer(file"/tmp/futfut.avi")
-      .map(f =>
-        Ok(views.html.trailermade(f.pathAsString))
-      )
+      .map(f => Ok(views.html.trailermade(f.pathAsString)))
   }
 }
