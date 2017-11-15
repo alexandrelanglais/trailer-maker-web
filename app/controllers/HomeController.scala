@@ -7,19 +7,28 @@ import io.trailermaker.core.TrailerMaker
 import play.api._
 import play.api.mvc._
 import better.files._
+import play.api.data.Form
+import play.api.i18n.Lang
+import play.api.i18n.Langs
+import play.api.i18n.MessagesImpl
+import play.api.i18n.MessagesProvider
 import play.api.libs.concurrent.CustomExecutionContext
 
 import scala.concurrent.ExecutionContext
 import scala.util.Failure
 import scala.util.Success
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+class HomeController @Inject()(langs: Langs, cc: ControllerComponents) extends AbstractController(cc) {
+  val lang: Lang = langs.availables.head
+
+  implicit val messagesProvider: MessagesProvider = {
+    MessagesImpl(lang, messagesApi)
+  }
 
   /**
     * Create an Action to render an HTML page.
@@ -29,12 +38,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     * a path of `/`.
     */
   def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index())
+    Ok(views.html.index(TrailersController.trailerForm))
   }
 
-  def makeTrailer() = Action.async {
-    TrailerMaker
-      .makeTrailer(file"/tmp/futfut.avi")
-      .map(f => Ok(views.html.trailermade(f.pathAsString)))
-  }
 }

@@ -1,11 +1,18 @@
-@()
+@(trailerForm: Form[TrailerData])(implicit messages: Messages)
 
 @main("Trailer Maker") {
-<h1>The easiest way to create trailers</h1>
-<h2>Just upload your video and adjust your settings</h2>
-<form>
-  <input type="file" name="video"/>
+<h1>Easy way to create trailers.</h1>
+<h3>Just upload your video and adjust your settings</h3>
+
+@helper.form(action = routes.TrailersController.makeTrailer()) {
+  @helper.inputText(trailerForm("duration"))
+}
+
+<!--
+<form id="formTrailer" method="post" action="/mt">
+  <input type="text" name="length" placeholder="Final length in ms" value="15000"/>
   <input type="submit" value="Go!"/>
 </form>
+-->
 <div id="progress"></div>
 }
