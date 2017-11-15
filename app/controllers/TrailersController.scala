@@ -1,5 +1,6 @@
 package controllers
 
+import java.nio.file.Paths
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -25,13 +26,14 @@ import play.api.mvc.Result
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-case class TrailerData(duration: Int)
+case class TrailerData(duration: Int, length: Int)
 
 object TrailersController {
 
   val trailerForm = Form(
     mapping(
       "duration" -> number(min = 2000, max = 30000),
+      "length" -> number(min = 1000, max = 5000),
     )(TrailerData.apply)(TrailerData.unapply)
   )
 }
@@ -50,21 +52,33 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
     Ok("Ajax Call!")
   }
 
-  def makeTrailer = Action.async { implicit request =>
-    trailerForm.bindFromRequest.fold(
-      formWithErrors =>
-        Future {
-          // binding failure, you retrieve the form containing errors:
-          Ok(views.html.index(formWithErrors))
-      },
-      userData => {
-        val outStr    = UUID.randomUUID().toString
-        val outFolder = configuration.underlying.getString("output.folder")
-        val opts      = Some(TMOptions(duration = Some(15000L), outputFile = Some(File(outFolder + "/" + outStr))))
-        val fut       = TrailerMaker.makeTrailer(file"/home/edoc2/Vidéos/futfut.avi", opts)
-        fut.map(f => Ok(views.html.progress(f.name)))
+  def makeTrailer = Action.async(parse.multipartFormData) { implicit request =>
+    request.body
+      .file("video")
+      .map { video =>
+        // only get the last part of the filename
+        // otherwise someone can send a path like ../../home/foo/bar.txt to write to other files on the system
+        val filename = UUID.randomUUID().toString
+
+        val tmpFile = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
+
+        trailerForm.bindFromRequest.fold(
+          formWithErrors =>
+            Future {
+              Ok(views.html.index(formWithErrors))
+          },
+          userData => {
+            val outStr    = UUID.randomUUID().toString
+            val outFolder = configuration.underlying.getString("output.folder")
+            val opts      = Some(TMOptions(duration = Some(15000L), outputFile = Some(File(outFolder + "/" + outStr))))
+            val fut       = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
+            fut.map(f => Ok(views.html.progress(f.name)))
+          }
+        )
       }
-    )
+      .getOrElse {
+        Future { Redirect(routes.HomeController.index).flashing("error" -> "Missing file") }
+      }
   }
 
   def getTrailer(fileName: String) = Action { implicit request =>

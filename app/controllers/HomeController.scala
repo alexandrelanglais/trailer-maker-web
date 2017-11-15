@@ -38,7 +38,7 @@ class HomeController @Inject()(langs: Langs, cc: ControllerComponents) extends A
     * a path of `/`.
     */
   def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index(TrailersController.trailerForm))
+    Ok(views.html.index(TrailersController.trailerForm.fill(TrailerData(duration = 15000, length = 1000))))
   }
 
 }

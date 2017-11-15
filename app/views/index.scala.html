@@ -4,8 +4,14 @@
 <h1>Easy way to create trailers.</h1>
 <h3>Just upload your video and adjust your settings</h3>
 
-@helper.form(action = routes.TrailersController.makeTrailer()) {
+@helper.form(action = routes.TrailersController.makeTrailer(), 'enctype -> "multipart/form-data") {
   @helper.inputText(trailerForm("duration"))
+  @helper.inputText(trailerForm("length"))
+
+  <input type="file" name="video">
+  <p>
+    <input type="submit">
+  </p>
 }
 
 <!--
