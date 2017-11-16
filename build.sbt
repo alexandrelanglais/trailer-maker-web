@@ -19,3 +19,7 @@ libraryDependencies += "io.trailermaker" %% "trailer-maker" % "0.1-SNAPSHOT"
 // play.sbt.routes.RoutesKeys.routesImport += "io.trailermaker.binders._"
 
 libraryDependencies += "com.github.pathikrit" %% "better-files" % "3.2.0"
+
+sources in (Compile, doc) := Seq.empty
+
+publishArtifact in (Compile, packageDoc) := false
