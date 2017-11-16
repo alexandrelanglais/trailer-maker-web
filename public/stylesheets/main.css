@@ -1,0 +1,23 @@
+.error {
+    color:red;
+    text-align:center;
+}
+
+header h3 {
+    text-align:left;
+}
+
+.jumbotron h1, .jumbotron h2, .jumbotron h3 {
+  text-align:center;
+}
+
+a.text-muted:hover {
+    text-decoration: none
+}
+
+.form-actions {
+    margin: 0;
+    margin-top: 1rem;
+    background-color: transparent;
+    text-align: center;
+}

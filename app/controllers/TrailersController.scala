@@ -9,6 +9,7 @@ import akka.stream.scaladsl.FileIO
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import better.files._
+import io.trailermaker.core.AvConvInfo
 import io.trailermaker.core.TMOptions
 import io.trailermaker.core.TrailerMaker
 import play.api.data.Forms._
@@ -25,53 +26,63 @@ import play.api.mvc.Result
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 case class TrailerData(duration: Int, length: Int)
-
-object TrailersController {
-
-  val trailerForm = Form(
-    mapping(
-      "duration" -> number(min = 2000, max = 30000),
-      "length"   -> number(min = 1000, max = 5000),
-    )(TrailerData.apply)(TrailerData.unapply)
-  )
-}
 
 @Singleton
 class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, configuration: play.api.Configuration)(implicit ec: ExecutionContext)
     extends AbstractController(cc) {
-  import TrailersController._
   val lang: Lang = langs.availables.head
 
   implicit val messagesProvider: MessagesProvider = {
     MessagesImpl(lang, messagesApi)
   }
 
+  val minTrailerDuration = configuration.underlying.getInt("trailer.duration.min")
+  val maxTrailerDuration = configuration.underlying.getInt("trailer.duration.max")
+
+  val minTrailerCutLength = configuration.underlying.getInt("trailer.cutlength.min")
+  val maxTrailerCutLength = configuration.underlying.getInt("trailer.cutlength.max")
+
+  val trailerForm = Form(
+    mapping(
+      "duration" -> number(min = minTrailerDuration, max = maxTrailerDuration),
+      "length"   -> number(min = minTrailerCutLength, max = maxTrailerCutLength),
+    )(TrailerData.apply)(TrailerData.unapply)
+  )
+
   def makeTrailer = Action.async(parse.multipartFormData) { implicit request =>
     request.body
       .file("video")
       .filterNot(_.ref.length == 0)
       .map { video =>
-        val filename = UUID.randomUUID().toString
-        val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
+        AvConvInfo.readFileInfo(File(video.ref)).filter(_.duration != 0.seconds)
+          .flatMap(_ => {
+          val filename = UUID.randomUUID().toString
+          val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
 
-        trailerForm.bindFromRequest.fold(
-          formWithErrors =>
-            Future {
-              BadRequest(views.html.index(formWithErrors))
-            },
-          userData => {
-            val outStr    = UUID.randomUUID().toString
-            val outFolder = configuration.underlying.getString("output.folder")
-            val opts      = Some(TMOptions(duration = Some(15000L), outputFile = Some(File(outFolder + "/" + outStr))))
-            val fut       = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
-            fut.map(f => Ok(views.html.progress(f.name)))
+          trailerForm.bindFromRequest.fold(
+            formWithErrors =>
+              Future {
+                BadRequest(views.html.index(formWithErrors, configuration))
+              },
+            userData => {
+              val outStr    = UUID.randomUUID().toString
+              val outFolder = configuration.underlying.getString("output.folder")
+              val opts      = Some(TMOptions(duration = Some(userData.duration), length = Some(userData.length), outputFile = Some(File(outFolder + "/" + outStr))))
+              val fut       = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
+              fut.map(f => Ok(views.html.progress(f.name)))
+            }
+          )
+        }).recoverWith {
+          case _ => Future {
+            Redirect(routes.HomeController.index).flashing("error" -> "Please choose a video file")
           }
-        )
+        }
       }
       .getOrElse {
-        Future { Redirect(routes.HomeController.index).flashing("error" -> "Missing file") }
+        Future { Redirect(routes.HomeController.index).flashing("error" -> "Please choose a file") }
       }
 
   }

@@ -23,7 +23,7 @@ import scala.util.Success
   * application's home page.
   */
 @Singleton
-class HomeController @Inject()(langs: Langs, cc: ControllerComponents) extends AbstractController(cc) {
+class HomeController @Inject()(langs: Langs, cc: ControllerComponents, tc: TrailersController, configuration: play.api.Configuration) extends AbstractController(cc) {
   val lang: Lang = langs.availables.head
 
   implicit val messagesProvider: MessagesProvider = {
@@ -38,7 +38,7 @@ class HomeController @Inject()(langs: Langs, cc: ControllerComponents) extends A
     * a path of `/`.
     */
   def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index(TrailersController.trailerForm.fill(TrailerData(duration = 15000, length = 1000))))
+    Ok(views.html.index(tc.trailerForm.fill(TrailerData(duration = 15000, length = 1000)), configuration))
   }
 
 }
