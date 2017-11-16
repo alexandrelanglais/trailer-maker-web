@@ -47,7 +47,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
 
   val trailerForm = Form(
     mapping(
-      "duration" -> number(min = minTrailerDuration, max = maxTrailerDuration),
+      "duration" -> number(min = minTrailerDuration, max  = maxTrailerDuration),
       "length"   -> number(min = minTrailerCutLength, max = maxTrailerCutLength),
     )(TrailerData.apply)(TrailerData.unapply)
   )
@@ -57,29 +57,34 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
       .file("video")
       .filterNot(_.ref.length == 0)
       .map { video =>
-        AvConvInfo.readFileInfo(File(video.ref)).filter(_.duration != 0.seconds)
+        AvConvInfo
+          .readFileInfo(File(video.ref))
+          .filter(_.duration != 0.seconds)
           .flatMap(_ => {
-          val filename = UUID.randomUUID().toString
-          val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
+            val filename = UUID.randomUUID().toString
+            val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
 
-          trailerForm.bindFromRequest.fold(
-            formWithErrors =>
-              Future {
-                BadRequest(views.html.index(formWithErrors, configuration))
+            trailerForm.bindFromRequest.fold(
+              formWithErrors =>
+                Future {
+                  BadRequest(views.html.index(formWithErrors, configuration))
               },
-            userData => {
-              val outStr    = UUID.randomUUID().toString
-              val outFolder = configuration.underlying.getString("output.folder")
-              val opts      = Some(TMOptions(duration = Some(userData.duration), length = Some(userData.length), outputFile = Some(File(outFolder + "/" + outStr))))
-              val fut       = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
-              fut.map(f => Ok(views.html.progress(f.name)))
-            }
-          )
-        }).recoverWith {
-          case _ => Future {
-            Redirect(routes.HomeController.index).flashing("error" -> "Please choose a video file")
+              userData => {
+                val outStr    = UUID.randomUUID().toString
+                val outFolder = configuration.underlying.getString("output.folder")
+                val opts =
+                  Some(TMOptions(duration = Some(userData.duration), length = Some(userData.length), outputFile = Some(File(outFolder + "/" + outStr))))
+                val fut = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
+                fut.map(f => Ok(views.html.progress(f.name, configuration)))
+              }
+            )
+          })
+          .recoverWith {
+            case _ =>
+              Future {
+                Redirect(routes.HomeController.index).flashing("error" -> "Please choose a video file")
+              }
           }
-        }
       }
       .getOrElse {
         Future { Redirect(routes.HomeController.index).flashing("error" -> "Please choose a file") }

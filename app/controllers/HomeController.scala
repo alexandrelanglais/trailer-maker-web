@@ -23,7 +23,8 @@ import scala.util.Success
   * application's home page.
   */
 @Singleton
-class HomeController @Inject()(langs: Langs, cc: ControllerComponents, tc: TrailersController, configuration: play.api.Configuration) extends AbstractController(cc) {
+class HomeController @Inject()(langs: Langs, cc: ControllerComponents, tc: TrailersController, configuration: play.api.Configuration)
+    extends AbstractController(cc) {
   val lang: Lang = langs.availables.head
 
   implicit val messagesProvider: MessagesProvider = {

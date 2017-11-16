@@ -1,6 +1,7 @@
-@(id: String)
+@(id: String, conf: play.api.Configuration)
 
 @main("Trailer Maker") {
 <h1>Your trailer is ready.</h1>
 <h3><a href="/trailers/get/@id">Download</a></h3>
+<div id="trailerAvailableFor" class="text-muted text-center">Your download will be available for @conf.get[String]("trailer.available.for") minutes</div>
 }
