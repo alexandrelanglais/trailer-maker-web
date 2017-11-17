@@ -22,6 +22,15 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/narrow-jumbotron.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
+
+        <link rel="stylesheet" href="@routes.Assets.versioned("jquery-fileupload/css/jquery.fileupload.css")"/>
+        <link rel="stylesheet" href="@routes.Assets.versioned("jquery-fileupload/css/jquery.fileupload-ui.css")"/>
+        <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
+        <script src="@routes.Assets.versioned("jquery-fileupload/js/vendor/jquery.ui.widget.js")"></script>
+        <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
+        <script src="@routes.Assets.versioned("jquery-fileupload/js/jquery.iframe-transport.js")"></script>
+        <!-- The basic File Upload plugin -->
+        <script src="@routes.Assets.versioned("jquery-fileupload/js/jquery.fileupload.js")"></script>
     </head>
     <body>
     <div class="container">

@@ -7,7 +7,8 @@
 GET     /                           controllers.HomeController.index
 
 GET     /trailers/get/:file         controllers.TrailersController.getTrailer(file: String)
-POST     /trailers/mt               controllers.TrailersController.makeTrailer
+POST    /trailers/mt                controllers.TrailersController.makeTrailer
+POST    /upload                     controllers.TrailersController.upload
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

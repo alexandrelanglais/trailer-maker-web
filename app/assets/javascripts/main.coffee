@@ -1,24 +1,18 @@
-$(document).ready ->
-#    $('#formTrailer').submit (e) ->
-#        e.preventDefault()
-#        alert "Ok on soumet"
-#        false
-#
-    # Basic Examples
-#	$.get '/trailers/get', (data) ->
-#		$('#progress').append "Successfully got the page."
-#
-#	$.post '/',
-#		userName: 'John Doe'
-#		favoriteFlavor: 'Mint'
-#		(data) -> $('#progress').append "Successfully posted to the page."
-#
-#	# Advanced Settings
-#	$.ajax '/',
-#		type: 'GET'
-#		dataType: 'html'
-#		error: (jqXHR, textStatus, errorThrown) ->
-#			$('#progress').append "AJAX Error: #{textStatus}"
-#		success: (data, textStatus, jqXHR) ->
-#			$('#progress').append "Successful AJAX call: #{data}"
-
+$ ->
+  'use strict'
+  # Change this to the location of your server-side upload handler:
+  url = '/upload'
+  $('#fileupload').fileupload(
+    url: url
+    dataType: 'json'
+    done: (e, data) ->
+      $.each data.result.files, (index, file) ->
+        $('<p/>').text(file.name).appendTo '#files'
+        return
+      return
+    progressall: (e, data) ->
+      progress = parseInt(data.loaded / data.total * 100, 10)
+      $('#progress .progress-bar').css 'width', progress + '%'
+      return
+  ).prop('disabled', !$.support.fileInput).parent().addClass if $.support.fileInput then undefined else 'disabled'
+  return

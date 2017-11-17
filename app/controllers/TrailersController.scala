@@ -107,4 +107,20 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
     )
 //    Ok.sendFile(content = new java.io.File(), inline = false, fileName = _ => "trailer.webm")
   }
+
+  def upload = Action.async(parse.multipartFormData) { implicit request =>
+    request.body
+      .file("video")
+      .filterNot(_.ref.length == 0)
+      .map { video =>
+        val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/toto.txt"), replace = true)
+        Future { Ok(views.html.progress(tmpFile.getAbsolutePath, configuration))}
+      }
+      .getOrElse {
+        Future { Redirect(routes.HomeController.index).flashing("error" -> "Please choose a file") }
+      }
+
+  }
+
+
 }
