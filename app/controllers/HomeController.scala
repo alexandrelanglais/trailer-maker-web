@@ -39,7 +39,7 @@ class HomeController @Inject()(langs: Langs, cc: ControllerComponents, tc: Trail
     * a path of `/`.
     */
   def index() = Action { implicit request: Request[AnyContent] =>
-    Ok(views.html.index(tc.trailerForm.fill(TrailerData(duration = 15000, length = 1000)), configuration))
+    Ok(views.html.index(tc.trailerForm.fill(TrailerData(duration = 15000, length = 1000, videoref = "")), configuration))
   }
 
 }

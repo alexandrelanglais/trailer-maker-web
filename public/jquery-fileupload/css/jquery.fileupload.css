@@ -22,6 +22,8 @@
   -ms-filter: 'alpha(opacity=0)';
   cursor: pointer;
   width: 100%;
+  position: absolute;
+  left: 0;
 }
 
 /* Fixes for IE < 8 */

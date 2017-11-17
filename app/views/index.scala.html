@@ -10,7 +10,7 @@
 <div class="error"><strong>{err}</strong></div>
 })
 
-@helper.form(action = routes.TrailersController.makeTrailer(), 'enctype -> "multipart/form-data") {
+@helper.form(action = routes.TrailersController.makeTrailer(), 'id -> "makeTrailer") {
 <!-- The fileinput-button span is used to style the file input field as button -->
   <span class="btn btn-success fileinput-button">
         <i class="glyphicon glyphicon-plus"></i>
@@ -26,7 +26,10 @@
 <!-- The container for the uploaded files -->
 <div id="files" class="files"></div>
 
-<div class="row">
+<div class="form-group error" id="noFileError"></div>
+
+<input type="hidden" id="videoref" name="videoref"/>
+<div class="row" id="inputs">
   @helper.input(trailerForm("duration"), '_showConstraints -> false) { (id, name, value, args) =>
   <input type="text" name="@name" id="@id" class="form-control" value="@value" aria-describedby="durationHelp" @toHtmlArgs(args)>
   <small id="durationHelp" class="form-text text-muted">Between @conf.get[String]("trailer.duration.min") and @conf.get[String]("trailer.duration.max") ms </small>
@@ -39,7 +42,7 @@
 </div>
 
 <div class="form-actions">
-  <button type="submit" class="btn btn-primary">Make trailer</button>
+  <button type="submit" id="btnMakeTrailer" class="btn btn-primary">Make trailer</button>
 </div>
 }
 }

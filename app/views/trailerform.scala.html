@@ -1,0 +1,13 @@
+@(trailerForm: Form[TrailerData], conf: play.api.Configuration)(implicit messages: Messages, flash: Flash)
+
+@implicitField = @{ helper.FieldConstructor(trailer.f) }
+  @helper.input(trailerForm("duration"), '_showConstraints -> false) { (id, name, value, args) =>
+  <input type="text" name="@name" id="@id" class="form-control" value="@value" aria-describedby="durationHelp" @toHtmlArgs(args)>
+  <small id="durationHelp" class="form-text text-muted">Between @conf.get[String]("trailer.duration.min") and @conf.get[String]("trailer.duration.max") ms </small>
+  }
+
+  @helper.input(trailerForm("length"), '_showConstraints -> false) { (id, name, value, args) =>
+  <input type="text" name="@name" id="@id" class="form-control" value="@value" aria-describedby="lengthHelp" @toHtmlArgs(args)>
+  <small id="lengthHelp" class="form-text text-muted">Between @conf.get[String]("trailer.cutlength.min") and @conf.get[String]("trailer.cutlength.max") ms </small>
+  }
+

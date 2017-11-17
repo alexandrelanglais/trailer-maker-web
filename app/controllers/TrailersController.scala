@@ -19,6 +19,7 @@ import play.api.i18n.Lang
 import play.api.i18n.MessagesImpl
 import play.api.i18n.MessagesProvider
 import play.api.i18n._
+import play.api.libs.json.Json
 import play.api.mvc.AbstractController
 import play.api.mvc.ControllerComponents
 import play.api.mvc.ResponseHeader
@@ -28,7 +29,8 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-case class TrailerData(duration: Int, length: Int)
+case class TrailerData(duration: Int, length:         Int, videoref: String)
+case class UploadedFile(name:    String, description: String)
 
 @Singleton
 class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, configuration: play.api.Configuration)(implicit ec: ExecutionContext)
@@ -39,6 +41,8 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
     MessagesImpl(lang, messagesApi)
   }
 
+  implicit val ufFormat = Json.format[UploadedFile]
+
   val minTrailerDuration = configuration.underlying.getInt("trailer.duration.min")
   val maxTrailerDuration = configuration.underlying.getInt("trailer.duration.max")
 
@@ -47,8 +51,9 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
 
   val trailerForm = Form(
     mapping(
-      "duration" -> number(min = minTrailerDuration, max  = maxTrailerDuration),
+      "duration" -> number(min = minTrailerDuration, max = maxTrailerDuration),
       "length"   -> number(min = minTrailerCutLength, max = maxTrailerCutLength),
+      "videoref"  -> nonEmptyText
     )(TrailerData.apply)(TrailerData.unapply)
   )
 
@@ -113,8 +118,20 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
       .file("video")
       .filterNot(_.ref.length == 0)
       .map { video =>
-        val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/toto.txt"), replace = true)
-        Future { Ok(views.html.progress(tmpFile.getAbsolutePath, configuration))}
+        AvConvInfo
+          .readFileInfo(File(video.ref))
+          .filter(_.duration != 0.seconds)
+          .flatMap(_ => {
+            val filename = UUID.randomUUID().toString
+            val tmpFile  = video.ref.moveTo(Paths.get(s"/tmp/$filename"), replace = true)
+            Future { Ok(Json.toJson(UploadedFile(name = filename, description = "File uploaded"))) }
+          })
+          .recoverWith {
+            case _ =>
+              Future {
+                Ok(Json.toJson(UploadedFile(name = "", description = "Could not parse file as video file")))
+              }
+          }
       }
       .getOrElse {
         Future { Redirect(routes.HomeController.index).flashing("error" -> "Please choose a file") }
@@ -122,5 +139,32 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
 
   }
 
+  def makeTrailerAsync = Action { implicit request =>
+    trailerForm.bindFromRequest.fold(
+      formWithErrors => BadRequest(views.html.trailerform(formWithErrors, configuration)),
+      userData => {
+        val outStr    = UUID.randomUUID().toString
+        val outFolder = configuration.underlying.getString("output.folder")
+        val inFile    = userData.videoref
+        val opts =
+          Some(
+            TMOptions(
+              duration     = Some(userData.duration),
+              length       = Some(userData.length),
+              outputFile   = Some(File(outFolder + "/" + outStr)),
+              progressFile = Some(File(outFolder + "/" + outStr + ".txt"))
+            ))
+        TrailerMaker.makeTrailer(File(s"/tmp/$inFile"), opts)
+        Ok(outStr)
+      }
+    )
+  }
+
+  def showProgress(videoref: String) = Action { implicit request =>
+    try {
+      val line = File(videoref).newFileReader.buffered.readLine()
+      Ok(line)
+    } catch { case _: Throwable => BadRequest("Bad ref") }
+  }
 
 }
