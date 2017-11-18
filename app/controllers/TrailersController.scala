@@ -29,8 +29,10 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-case class TrailerData(duration: Int, length:         Int, videoref: String)
-case class UploadedFile(name:    String, description: String)
+case class TrailerData(duration:   Int, length:         Int, videoref: String)
+case class UploadedFile(name:      String, description: String)
+case class TrailerResult(videoref: String, message:     String)
+case class TrailerProgress(line:   String, complete:    Boolean)
 
 @Singleton
 class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, configuration: play.api.Configuration)(implicit ec: ExecutionContext)
@@ -42,6 +44,8 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
   }
 
   implicit val ufFormat = Json.format[UploadedFile]
+  implicit val trFormat = Json.format[TrailerResult]
+  implicit val tpFormat = Json.format[TrailerProgress]
 
   val minTrailerDuration = configuration.underlying.getInt("trailer.duration.min")
   val maxTrailerDuration = configuration.underlying.getInt("trailer.duration.max")
@@ -53,7 +57,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
     mapping(
       "duration" -> number(min = minTrailerDuration, max = maxTrailerDuration),
       "length"   -> number(min = minTrailerCutLength, max = maxTrailerCutLength),
-      "videoref"  -> nonEmptyText
+      "videoref" -> nonEmptyText
     )(TrailerData.apply)(TrailerData.unapply)
   )
 
@@ -95,6 +99,10 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
         Future { Redirect(routes.HomeController.index).flashing("error" -> "Please choose a file") }
       }
 
+  }
+
+  def download(fileName: String) = Action { implicit request =>
+    Ok(views.html.progress(fileName, configuration))
   }
 
   def getTrailer(fileName: String) = Action { implicit request =>
@@ -155,15 +163,17 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
               progressFile = Some(File(outFolder + "/" + outStr + ".txt"))
             ))
         TrailerMaker.makeTrailer(File(s"/tmp/$inFile"), opts)
-        Ok(outStr)
+        Ok(Json.toJson(TrailerResult(outStr, "In progress")))
       }
     )
   }
 
   def showProgress(videoref: String) = Action { implicit request =>
     try {
-      val line = File(videoref).newFileReader.buffered.readLine()
-      Ok(line)
+      val outFolder = configuration.underlying.getString("output.folder")
+      val line:     String  = File(s"$outFolder/$videoref.txt").newFileReader.buffered.readLine()
+      val complete: Boolean = line.startsWith("Complete:")
+      Ok(Json.toJson(TrailerProgress(line, complete)))
     } catch { case _: Throwable => BadRequest("Bad ref") }
   }
 

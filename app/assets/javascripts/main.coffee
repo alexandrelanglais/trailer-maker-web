@@ -1,5 +1,22 @@
 $ ->
-  #$('#btnMakeTrailer').prop('disabled', true)
+  $('#btnMakeTrailer').prop('disabled', true)
+
+  startMonitoring = (videoref) ->
+    $.ajax
+      url: '/progress/' + videoref
+      type: 'post'
+      dataType: 'json'
+      contentType: "application/json; charset=utf-8"
+      success: (data, s) =>
+        $('#inputs').html('')
+        if !data.complete
+          $('<div class="col"/>').text(data.line).appendTo '#inputs'
+          setTimeout ( -> startMonitoring videoref), 500
+        else
+          window.location.href = '/download/' + data.line.substr(data.line.indexOf(':') + 1)
+      error: (data, s, e) ->
+        setTimeout ( -> startMonitoring videoref), 500
+        console.log(data.responseText)
 
   url = '/upload'
   $('#fileupload').fileupload(
@@ -24,6 +41,7 @@ $ ->
       return
   ).prop('disabled', !$.support.fileInput).parent().addClass if $.support.fileInput then undefined else 'disabled'
 
+
   $('#makeTrailer').on('submit', (e) ->
     e.preventDefault
     if $('#videoref').val() == ''
@@ -41,11 +59,16 @@ $ ->
       dataType: 'json'
       contentType: "application/json; charset=utf-8"
       data: JSON.stringify(indexed_array)
-      success: (data) ->
-        $('#inputs').html("Your trailer is being prepared")
-      error: (e) ->
-        $('#inputs').html(e.responseText)
-        console.log(e.responseText)
+      success: (data, s) ->
+        $('#inputs').html('')
+        $('<div class="col"/>').text("Your trailer is being prepared").appendTo '#inputs'
+        $('#btnMakeTrailer').prop('disabled', true)
+        setTimeout ( -> startMonitoring data.videoref), 1000
+      error: (data, s, e) ->
+        $('#inputs').html(data.responseText)
+        console.log(data.responseText)
 
     return false
   )
+
+

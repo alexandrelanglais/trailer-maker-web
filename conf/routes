@@ -7,6 +7,7 @@
 GET     /                           controllers.HomeController.index
 
 GET     /trailers/get/:file         controllers.TrailersController.getTrailer(file: String)
+GET     /download/:file             controllers.TrailersController.download(file: String)
 POST    /trailers/mt                controllers.TrailersController.makeTrailer
 POST    /upload                     controllers.TrailersController.upload
 POST    /trailers/mta               controllers.TrailersController.makeTrailerAsync
