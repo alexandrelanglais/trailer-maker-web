@@ -79,10 +79,9 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
                   BadRequest(views.html.index(formWithErrors, configuration))
               },
               userData => {
-                val outStr    = UUID.randomUUID().toString
                 val outFolder = configuration.underlying.getString("output.folder")
                 val opts =
-                  Some(TMOptions(duration = Some(userData.duration), length = Some(userData.length), outputFile = Some(File(outFolder + "/" + outStr))))
+                  Some(TMOptions(duration = Some(userData.duration), length = Some(userData.length), outputDir = Some(File(outFolder))))
                 val fut = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
                 fut.map(f => Ok(views.html.progress(f.name, configuration)))
               }
@@ -159,7 +158,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
             TMOptions(
               duration     = Some(userData.duration),
               length       = Some(userData.length),
-              outputFile   = Some(File(outFolder + "/" + outStr)),
+              outputDir    = Some(File(outFolder)),
               progressFile = Some(File(outFolder + "/" + outStr + ".txt"))
             ))
         TrailerMaker.makeTrailer(File(s"/tmp/$inFile"), opts)
