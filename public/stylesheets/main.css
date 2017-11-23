@@ -11,6 +11,12 @@ header h3 {
     text-align:left;
 }
 
+.jumbotron form {
+  margin-top: 1.5rem;
+  background-color: white;
+  padding: .5rem
+}
+
 .jumbotron h1, .jumbotron h2, .jumbotron h3 {
   text-align:center;
 }
@@ -35,4 +41,12 @@ a.text-muted:hover {
 
 #progress {
 	margin: 1rem;
+}
+
+#main {
+    max-width: 800px
+}
+
+.fileuploadbtn {
+    text-align:center
 }

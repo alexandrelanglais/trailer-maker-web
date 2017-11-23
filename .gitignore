@@ -70,4 +70,5 @@ fabric.properties
 
 .idea/
 
+public/deps
 # End of https://www.gitignore.io/api/intellij+all

@@ -10,16 +10,19 @@
 <html lang="en">
     <head>
         <title>@title</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
 
-        <script src="@routes.Assets.versioned("bootstrap/js/jquery-3.2.1.min.js")"></script>
-        <script src="@routes.Assets.versioned("bootstrap/js/popper.min.js")"></script>
+        <script src="@routes.Assets.versioned("deps/node_modules/bootstrap/node_modules/jquery/dist/jquery.min.js")"></script>
+        <script src="@routes.Assets.versioned("deps/node_modules/bootstrap/node_modules/tether/dist/js/tether.min.js")"></script>
 
-        <link rel="stylesheet" href="@routes.Assets.versioned("bootstrap/css/bootstrap.min.css")">
-        <script src="@routes.Assets.versioned("bootstrap/js/bootstrap.min.js")"></script>
+        <link rel="stylesheet" href="@routes.Assets.versioned("deps/node_modules/bootstrap/node_modules/tether/dist/css/tether.min.css")">
+        <link rel="stylesheet" href="@routes.Assets.versioned("deps/node_modules/bootstrap/dist/css/bootstrap.min.css")">
+        <script src="@routes.Assets.versioned("deps/node_modules/bootstrap/dist/js/bootstrap.min.js")"></script>
 
-        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/narrow-jumbotron.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/heroic-features.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("stylesheets/main.css")">
         <script src="@routes.Assets.versioned("javascripts/main.js")"></script>
 
@@ -31,36 +34,52 @@
         <script src="@routes.Assets.versioned("jquery-fileupload/js/jquery.iframe-transport.js")"></script>
         <!-- The basic File Upload plugin -->
         <script src="@routes.Assets.versioned("jquery-fileupload/js/jquery.fileupload.js")"></script>
+
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
     </head>
     <body>
-    <div class="container">
-        <div class="header clearfix">
+
+    <div class="container" id="main">
+    <!-- Navigation -->
+      <div class="header clearfix">
             <nav>
                 <ul class="nav nav-pills float-right">
                     <li class="nav-item">
-                        <a class="nav-link active" href="https://github.com/alexandrelanglais/trailer-maker-web">We're open source</a>
+                        <a class="nav-link" href="https://www.reddit.com/r/trailermaker">Trouble?</a>
                     </li>
                 </ul>
             </nav>
             <h3 class="text-muted"><a class="text-muted" href="/">Trailer maker</a></h3>
-        </div>
-
-        <div class="jumbotron">
-            @content
-        </div>
-        <div class="row marketing">
-            <div class="col">
-                <h4>Duration</h4>
-                <p>Specify the length in milliseconds of the resulting trailer you want to create.</p>
-
-                <h4>Cut length</h4>
-                <p>Defines in milliseconds the length of each part used to make the trailer.</p>
+      </div>
+      <!-- Jumbotron Header -->
+      <header class="jumbotron hero-spacer">
+          @content
+      </header>
+      <hr>
+      <div class="row text-center">
+        <div class="col-lg-6 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Duration</h4>
+              <p class="card-text">Specify the length in milliseconds of the resulting trailer you want to create.</p>
             </div>
+          </div>
         </div>
-        <footer class="footer">
-            <p>&copy; Trailermaker.io 2017</p>
-        </footer>
-
+        <div class="col-lg-6 col-md-6 mb-4">
+          <div class="card">
+            <div class="card-body">
+              <h4 class="card-title">Cut length</h4>
+              <p class="card-text">Defines in milliseconds the length of each part used to make the trailer.</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+      <!-- /.container -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">&copy; Trailermaker.io 2017</p>
+      </div>
+    </footer>
     </body>
 </html>
