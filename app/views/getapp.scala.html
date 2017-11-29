@@ -1,0 +1,19 @@
+@()
+
+@main("Trailer Maker") {
+<h1>Download the standalone app.</h1>
+<h3>Choose your platform</h3>
+
+<script type="text/javascript">
+function download(d) {
+        if (d == 'Select platform') return;
+        window.location = '/assets/binaries/' + d;
+}
+</script>
+
+<select id="download">
+    <option>Select platform</option>
+    <option value="trailer-maker_0.1_all.deb">Linux .deb (Ubuntu)</option>
+</select>
+<button onclick="download($('#download').val())">Download</button>
+}

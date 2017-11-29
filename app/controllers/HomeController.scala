@@ -42,4 +42,8 @@ class HomeController @Inject()(langs: Langs, cc: ControllerComponents, tc: Trail
     Ok(views.html.index(tc.trailerForm.fill(TrailerData(duration = 15000, length = 1000, videoref = "")), configuration))
   }
 
+  def getApp() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.getapp())
+  }
+
 }
