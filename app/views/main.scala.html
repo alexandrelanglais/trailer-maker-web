@@ -9,6 +9,15 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=UA-110484681-1"></script>
+        <script>
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+
+          gtag('config', 'UA-110484681-1');
+        </script>
         <title>@title</title>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -68,29 +77,7 @@
             </nav>
             <h3 class="text-muted"><a class="text-muted" href="/">Trailer maker</a></h3>
       </div>
-      <!-- Jumbotron Header -->
-      <header class="jumbotron hero-spacer">
-          @content
-      </header>
-      <hr>
-      <div class="row text-center">
-        <div class="col-lg-6 col-md-6 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <h4 class="card-title">Duration</h4>
-              <p class="card-text">Specify the length in milliseconds of the resulting trailer you want to create.</p>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 col-md-6 mb-4">
-          <div class="card">
-            <div class="card-body">
-              <h4 class="card-title">Cut length</h4>
-              <p class="card-text">Defines in milliseconds the length of each part used to make the trailer.</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      @content
     </div>
       <!-- /.container -->
     <footer class="py-5 bg-dark">

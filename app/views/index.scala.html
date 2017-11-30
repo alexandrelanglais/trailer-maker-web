@@ -3,6 +3,7 @@
 @implicitField = @{ helper.FieldConstructor(trailer.f) }
 
 @main("Trailer Maker") {
+<header class="jumbotron hero-spacer">
 <h1>Easy way to create trailers.</h1>
 <h3>Just upload your video and adjust your settings</h3>
 
@@ -46,4 +47,24 @@
   <button type="submit" id="btnMakeTrailer" class="btn btn-primary">Make trailer</button>
 </div>
 }
+</header>
+<div class="row text-center">
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Duration</h4>
+                <p class="card-text">Specify the length in milliseconds of the resulting trailer you want to create.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Cut length</h4>
+                <p class="card-text">Defines in milliseconds the length of each part used to make the trailer.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 }

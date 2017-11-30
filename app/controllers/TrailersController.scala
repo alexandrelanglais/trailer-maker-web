@@ -101,7 +101,8 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
   }
 
   def download(fileName: String) = Action { implicit request =>
-    Ok(views.html.progress(fileName, configuration))
+    if(file"/tmp/$fileName".exists) Ok(views.html.progress(fileName, configuration))
+    else Ok(views.html.unexistant(fileName))
   }
 
   def getTrailer(fileName: String) = Action { implicit request =>

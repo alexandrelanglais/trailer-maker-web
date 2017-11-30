@@ -1,19 +1,30 @@
 @()
 
 @main("Trailer Maker") {
+<header class="jumbotron hero-spacer">
 <h1>Download the standalone app.</h1>
 <h3>Choose your platform</h3>
-
-<script type="text/javascript">
-function download(d) {
-        if (d == 'Select platform') return;
-        window.location = '/assets/binaries/' + d;
-}
-</script>
-
-<select id="download">
-    <option>Select platform</option>
-    <option value="trailer-maker_0.1_all.deb">Linux .deb (Ubuntu)</option>
-</select>
-<button onclick="download($('#download').val())">Download</button>
+<br/>
+<div class="text-center">For full documentation / how to use refer to the
+    <a href="https://github.com/alexandrelanglais/trailer-maker/wiki/Usage">Github wiki</a>
+</div>
+</header>
+<div class="row text-center">
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Ubuntu/Debian</h4>
+                <p class="card-text"><a href="/binaries/trailer-maker_0.1_all.deb">trailer-maker_0.1_all.deb</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Fedora/Centos/Redhat</h4>
+                <p class="card-text"><a href="/binaries/trailer-maker_0.1_all.rpm">trailer-maker_0.1_all.rpm</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 }
