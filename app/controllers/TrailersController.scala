@@ -9,9 +9,11 @@ import akka.stream.scaladsl.FileIO
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import better.files._
-import io.trailermaker.core.AvConvInfo
 import io.trailermaker.core.TMOptions
 import io.trailermaker.core.TrailerMaker
+import io.trailermaker.core.impl.Media4sConcat
+import io.trailermaker.core.impl.Media4sCutter
+import io.trailermaker.core.impl.Media4sInfo
 import play.api.data.Forms._
 import play.api.data._
 import play.api.http.HttpEntity
@@ -53,6 +55,12 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
   val minTrailerCutLength = configuration.underlying.getInt("trailer.cutlength.min")
   val maxTrailerCutLength = configuration.underlying.getInt("trailer.cutlength.max")
 
+  val infoImpl   = Media4sInfo()
+  val cutImpl    = Media4sCutter()
+  val concatImpl = Media4sConcat()
+
+  val trailerMaker = TrailerMaker(infoImpl, cutImpl, concatImpl)
+
   val trailerForm = Form(
     mapping(
       "duration" -> number(min = minTrailerDuration, max = maxTrailerDuration),
@@ -66,7 +74,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
       .file("video")
       .filterNot(_.ref.length == 0)
       .map { video =>
-        AvConvInfo
+        infoImpl
           .readFileInfo(File(video.ref))
           .filter(_.duration != 0.seconds)
           .flatMap(_ => {
@@ -82,7 +90,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
                 val outFolder = configuration.underlying.getString("output.folder")
                 val opts =
                   Some(TMOptions(duration = Some(userData.duration), length = Some(userData.length), outputDir = Some(File(outFolder))))
-                val fut = TrailerMaker.makeTrailer(File(tmpFile.path), opts)
+                val fut = trailerMaker.makeTrailer(File(tmpFile.path), opts)
                 fut.map(f => Ok(views.html.progress(f.name, configuration)))
               }
             )
@@ -101,7 +109,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
   }
 
   def download(fileName: String) = Action { implicit request =>
-    if(file"/tmp/$fileName".exists) Ok(views.html.progress(fileName, configuration))
+    if (file"/tmp/$fileName".exists) Ok(views.html.progress(fileName, configuration))
     else Ok(views.html.unexistant(fileName))
   }
 
@@ -126,7 +134,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
       .file("video")
       .filterNot(_.ref.length == 0)
       .map { video =>
-        AvConvInfo
+        infoImpl
           .readFileInfo(File(video.ref))
           .filter(_.duration != 0.seconds)
           .flatMap(_ => {
@@ -162,7 +170,7 @@ class TrailersController @Inject()(langs: Langs, cc: ControllerComponents, confi
               outputDir    = Some(File(outFolder)),
               progressFile = Some(File(outFolder + "/" + outStr + ".txt"))
             ))
-        TrailerMaker.makeTrailer(File(s"/tmp/$inFile"), opts)
+        trailerMaker.makeTrailer(File(s"/tmp/$inFile"), opts)
         Ok(Json.toJson(TrailerResult(outStr, "In progress")))
       }
     )

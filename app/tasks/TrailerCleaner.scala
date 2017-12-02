@@ -22,11 +22,13 @@ object TrailerCleaner {
   def retrieveFilesOlderThan(maxAge: FiniteDuration): List[File] = {
     val dir = File("/tmp")
 
-    dir.list.filter(
+    dir.list
+      .filter(
         f =>
           (f.extension.map(_.equalsIgnoreCase(".webm")).getOrElse(false)
             && f.attributes.lastModifiedTime.to(MILLISECONDS) + maxAge.toMillis < new Date().getTime)
-    ).toList
+      )
+      .toList
 
   }
 }

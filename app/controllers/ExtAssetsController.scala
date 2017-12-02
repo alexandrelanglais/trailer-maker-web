@@ -11,9 +11,9 @@ import play.mvc.Results
 
 @Singleton
 class ExtAssetsController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+
   def at(filePath: String) = {
-    val file = new File(s"/opt/binaries/${filePath}")
+    val file = new File(s"/opt/binaries/$filePath")
     Results.ok(file, true)
   }
 }
-

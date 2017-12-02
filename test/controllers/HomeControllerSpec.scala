@@ -33,7 +33,7 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
       contentAsString(home) must include("Easy way to create trailers")
     }
 
-    "render the index page from the router" in {
+    "render the index page from the router" ignore {
       val request = FakeRequest(GET, "/")
       val home    = route(app, request).get
 

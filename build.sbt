@@ -5,7 +5,7 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file("."))
   .enablePlugins(PlayScala)
-  //.disablePlugins(PlayFilters)
+//.disablePlugins(PlayFilters)
 
 scalaVersion := "2.12.4"
 
@@ -13,7 +13,7 @@ libraryDependencies += guice
 libraryDependencies += "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % Test
 // You need to publish https://github.com/alexandrelanglais/trailer-maker/
 // in your local repository for this dependency to work
-libraryDependencies += "io.trailermaker" %% "trailer-maker" % "0.1-SNAPSHOT"
+libraryDependencies += "io.trailermaker" %% "trailer-maker" % "0.2"
 // Adds additional packages into Twirl
 //TwirlKeys.templateImports += "io.trailermaker.controllers._"
 
